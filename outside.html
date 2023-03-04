@@ -1,0 +1,207 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Outside</title>
+
+  <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+
+  <script>
+    AFRAME.registerComponent("door-home", {
+      init: function() {
+        this.el.addEventListener("click", (e) => {
+          enterPopup.showModal()
+          enterAreaTitle.innerText = "Home"
+          enterAreaAffirm.innerText = "Do you want to return home?"
+        })
+      }
+    })
+
+    AFRAME.registerComponent("door-market", {
+      init: function() {
+        this.el.addEventListener("click", (e) => {
+          enterPopup.showModal()
+          enterAreaTitle.innerText = "Supermarket"
+          enterAreaAffirm.innerText = "Do you want to enter the Supermarket?"
+        })
+      }
+    })
+
+    AFRAME.registerComponent("stall", {
+      init: function() {
+        this.el.addEventListener("mouseenter", (e) => {
+          document.querySelector('#ingredient-tip h1').style.display = 'block'
+          document.querySelector('#ingredient-tip h1').innerText = this.el.id
+        })
+
+        this.el.addEventListener("mouseleave", (e) => {
+          document.querySelector('#ingredient-tip h1').style.display = 'none'
+          document.querySelector('#ingredient-tip h1').innerText = ''
+        })
+
+        this.el.addEventListener("click", (e) => {
+          document.querySelector('#stall-popup').showModal()
+        })
+
+
+      }
+    })
+  </script>
+</head>
+<body>
+  <a-scene inspector="url: https://cdn.jsdelivr.net/gh/aframevr/aframe-inspector@master/dist/aframe-inspector.min.js">
+    <a-entity camera position="0.7 0.5 10.4" look-controls wasd-controls="acceleration: 10"> 
+      <a-cursor far="0.5"></a-cursor>
+    </a-entity>
+
+    <a-entity gltf-model="url(gltfs/Outside.gltf)" rotation="0 -90 0" scale=".6 .6 .6">
+      <a-box id="home-door" material="transparent: true; depthTest: false" 
+        opacity="0" 
+        position="18.210 0.794 -0.949" 
+        scale="1.1 1.1 1.1"
+        width="1"
+        depth="1"
+        height="1"
+        door-home></a-box>
+
+      <a-box id="market-door" material="transparent: true; depthTest: false" 
+        opacity="0" 
+        position="2.862 0.516 -0.324" 
+        scale="1.1 1.1 1.1"
+        width="1"
+        depth="2"
+        height="2"
+        door-market></a-box>
+
+      <a-entity gltf-model="url(gltfs/FreshStall.gltf)" position="-5.581 0.119 5.281" rotation="0 53.310 0" scale="0.5 0.5 0.5">
+
+        <a-box id="stall" material="transparent: true; depthTest: false" 
+          opacity="0"
+          position="5.411 0.242 -4.452" 
+          rotation="0 30 0"
+          scale="3 3 3"
+          stall
+          ></a-box>
+
+      </a-entity>
+
+    </a-entity>
+
+    <a-sky color="black"></a-sky>
+  </a-scene>
+
+  <div id="ingredient-tip" class="ingredient-tip">
+    <h1></h1>
+  </div>
+   
+  <div id="checklist" class="checklist">
+    <h1 id="checklist__title"></h1>
+    <ul id="checklist__list" class="no-margin-bottom">
+    </ul>
+  </div>
+
+  <dialog id="stall-popup" class="popup">
+    <h1>Stall</h1>
+    <p>Choose ingredient you need.</p>
+    <form method="dialog">
+      <button class="yes" value="meat">meat</button>
+      <button class="yes" value="sausage">sausage</button>
+      <button class="yes" value="vegetable">vegetable</button>
+      <button class="yes" value="cheese">cheese</button>
+      <button class="yes" value="egg">egg</button>
+      <button value="cancel">EXIT</button>
+    </form>
+  </dialog>
+   
+  <dialog id="enter-popup" class="popup">
+    <h1>Leave</h1>
+    <p>Do you want to enter the house?</p>
+    <form method="dialog">
+      <button value="cancel">Cancel</button>
+      <button class="yes" value="default">Yes</button>
+    </form>
+  </dialog>
+
+</body>
+
+<script>
+  const enterPopup = document.querySelector('#enter-popup')
+  const stallPopup = document.querySelector('#stall-popup')
+  const enterAreaTitle = document.querySelector('#enter-popup h1')
+  const enterAreaAffirm = document.querySelector('#enter-popup p')
+  
+  const homeDoor = document.querySelector('#home-door')
+  const marketDoor = document.querySelector('#market-door')
+
+  let recipe
+
+  recipe = JSON.parse(localStorage.getItem('recipe'))
+  setChecklist(recipe)
+
+  function setChecklist(recipe) {
+    document.querySelector('#checklist').style.display = 'block'
+    console.log(recipe)
+    document.querySelector('#checklist__title').innerText = `${recipe.title}`
+
+    recipe.ingredients.forEach(ingre => {
+      let haveIngredient = checkIngredientInHand(ingre)
+      document.querySelector('#checklist__list').innerHTML += `
+        <li id='${ingre}'  class='${haveIngredient ? 'strike' : ''}'>${ingre}</li>
+      `
+    })
+  }
+
+  enterPopup.addEventListener('close', (e) => {
+    if (enterPopup.returnValue === 'cancel') return
+
+    let areaToEnter = enterAreaTitle.innerText
+
+    switch(areaToEnter) {
+      case 'Home':
+        location.replace('./index.html')
+        break
+      case 'Supermarket':
+        location.replace('./market.html')
+        break
+    }
+  })
+
+  stallPopup.addEventListener('close', (e) => {
+    if (stallPopup.returnValue === 'cancel') return
+
+    let recipeHasIngredient = checkIngredientInRecipe(stallPopup.returnValue)
+    if (!recipeHasIngredient) return
+
+    let haveIngredient = checkIngredientInHand(stallPopup.returnValue)
+    if (!haveIngredient) {
+      addIngredientToStorage(stallPopup.returnValue)
+    }
+  })
+  
+  function checkIngredientInHand(ingreName) {
+    let ingredients = JSON.parse(localStorage.getItem('ingredients'))
+    let index = ingredients.findIndex(ingre => ingre == ingreName)
+    return index > -1 
+  }
+
+  function checkIngredientInRecipe(ingreName) {
+    let recipe = JSON.parse(localStorage.getItem('recipe'))
+    let index = recipe.ingredients.findIndex(ingre => ingre == ingreName)
+    return index > -1
+  }
+
+  function addIngredientToStorage(ingreName) {
+    let ingredients = JSON.parse(localStorage.getItem('ingredients'))
+    ingredients.push(ingreName)
+    localStorage.setItem('ingredients', JSON.stringify(ingredients))
+
+    let checklistItems = Array.from(document.querySelector('#checklist__list').children)
+    let item = checklistItems.find(checkItem => checkItem.id == ingreName)
+    item.classList.add('strike')
+  }
+
+</script>
+
+</html>

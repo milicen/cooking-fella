@@ -1,0 +1,250 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home</title>
+
+  <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/aframe-aabb-collider-component/dist/aframe-aabb-collider-component.min.js"></script>
+
+  <link rel="stylesheet" href="style.css">
+
+  <script>
+    AFRAME.registerComponent("door", {
+      init: function() {
+        this.el.addEventListener("click", (e) => {
+          exitPopup.showModal()
+        })
+      }
+    })
+
+    AFRAME.registerComponent("oven", {
+      init: function() {
+        this.el.addEventListener("click", (e) => {
+          cookPopup.showModal()
+
+          let achieved = JSON.parse(localStorage.getItem('ingredients'))
+          let recipe = JSON.parse(localStorage.getItem('recipe'))
+
+          let checkCount = 0
+
+          recipe.ingredients.forEach(ingre => {
+            if(achieved.includes(ingre)) {
+              checkCount++
+            }
+          });
+
+          document.querySelector('#cook').disabled = (checkCount == recipe.ingredients.length) ? false : true 
+        })
+      }
+    })
+  </script>
+
+</head>
+<body>
+  <a-scene inspector="url: https://cdn.jsdelivr.net/gh/aframevr/aframe-inspector@master/dist/aframe-inspector.min.js">
+    <a-entity camera position="0 2 0" look-controls wasd-controls="acceleration: 10"> 
+      <a-cursor far="0.5"></a-cursor>
+    </a-entity>
+    
+    
+    <a-entity gltf-model="url(gltfs/Kitchen.gltf)" scale=".6 .6 .6">
+      <a-box id="oven" material="transparent: true; depthTest: false" 
+        opacity="0" 
+        position="2.818 1.448 0.896" 
+        scale="1.1 1.1 1.1"
+        width="2"
+        depth="2"
+        height="2"
+        oven></a-box>
+
+      <a-box id="door" material="transparent: true; depthTest: false" 
+        opacity="0" 
+        position="-4.704 1.913 1.119" 
+        scale="1.1 1.1 1.1"
+        width="2"
+        depth="2"
+        height="5"
+        door></a-box>
+    </a-entity>
+
+    <a-sky color="black"></a-sky>
+  </a-scene>
+   
+  <div id="checklist" class="checklist">
+    <h1 id="checklist__title"></h1>
+    <ul id="checklist__list" class="no-margin-bottom">
+    </ul>
+  </div>
+
+  <dialog id="request-popup" class="popup">
+    <h1 id="request__title">Mom's Request - </h1>
+    <ul id="request__list">
+    </ul>
+    <form method="dialog">
+      <button class="yes" value="default">Accept</button>
+    </form>
+  </dialog>
+
+  <dialog id="cook-popup" class="popup">
+    <h1>Overview</h1>
+    <ul id="cook__list">
+    </ul>
+    <form method="dialog">
+      <button value="cancel">Cancel</button>
+      <button id="cook" class="yes" value="cook">Cook</button>
+    </form>
+  </dialog>
+   
+  <dialog id="exit-popup" class="popup">
+    <h1>Leave</h1>
+    <p>Do you want to leave the house?</p>
+    <form method="dialog">
+      <button value="cancel">Cancel</button>
+      <button class="yes" value="exit">Yes</button>
+    </form>
+  </dialog>
+
+  <dialog id="loading" class="loading popup">
+    <img src="imgs/food/loading.gif">
+    <p>Cooking in progress ...</p>
+    <form method="dialog">
+      <button class="yes">Send to mom :)</button>
+    </form>
+  </dialog>
+
+</body>
+
+<script>
+  const requestPopup = document.querySelector('#request-popup')
+  const cookPopup = document.querySelector('#cook-popup')
+  const exitPopup = document.querySelector('#exit-popup')
+
+  const loadingPopup = document.querySelector('#loading')
+  
+  const oven = document.querySelector('#oven')
+  const door = document.querySelector('#door')
+
+  let recipe
+
+  requestPopup.addEventListener('close', (e) => {
+    localStorage.setItem('recipe', JSON.stringify(recipe))
+    localStorage.setItem('fresh', false)
+    localStorage.setItem('ingredients', JSON.stringify([]))
+
+    setChecklist(recipe)
+
+    setCook(recipe)
+
+  })
+
+  cookPopup.addEventListener('close', (e) => {
+    if (cookPopup.returnValue === 'cook') {
+      loadingPopup.showModal()
+      const img = document.querySelector('#loading img')
+      const p = document.querySelector('#loading p')
+      const form = document.querySelector('#loading form')
+
+      setTimeout(() => {
+        switch(recipe.title) {
+          case 'bagel':
+            img.src = 'imgs/food/bagel.png'
+            break
+          case 'dumplings':
+            img.src = 'imgs/food/dumplings.jpg'
+            break
+          case 'hamburger':
+            img.src = 'imgs/food/hamburger.jpg'
+            break
+          case 'pizza':
+            img.src = 'imgs/food/pizza.jpg'
+            break
+          case 'cupcake':
+            img.src = 'imgs/food/cupcake.jpg'
+            break
+        }
+
+        p.innerText = 'Sweet! Mom\'s gonna love this!'
+        form.style.display = 'block'
+
+
+      }, 5000)
+    }
+  })
+
+  loadingPopup.addEventListener('close', (e) => {
+    localStorage.removeItem('recipe')
+    localStorage.removeItem('ingredients')
+    localStorage.removeItem('fresh')
+
+    location.replace('./index.html')
+  })
+
+  exitPopup.addEventListener('close', (e) => {
+    if (exitPopup.returnValue === 'exit') {
+      location.replace('./outside.html')
+    }
+  })
+
+  if (!localStorage.getItem('fresh') || JSON.parse(localStorage.getItem('fresh'))) {
+    localStorage.setItem('fresh', true)
+
+    let recipes = fetch('./recipes.json')
+      .then((response) => response.json())
+      .then((json) => {
+        recipes = json.recipes
+        requestPopup.showModal()
+        console.log(recipes)
+        recipe = recipes[Math.floor(Math.random() * recipes.length)]
+        console.log(recipe)
+        setRequest(recipe)
+      })
+  }
+  else {
+    recipe = JSON.parse(localStorage.getItem('recipe'))
+    setChecklist(recipe)
+    setCook(recipe)
+  }
+
+  function setChecklist(recipe) {
+    document.querySelector('#checklist').style.display = 'block'
+    document.querySelector('#checklist__title').innerText = `${recipe.title}`
+
+    recipe.ingredients.forEach(ingre => {
+      let haveIngredient = checkIngredientInHand(ingre)
+      document.querySelector('#checklist__list').innerHTML += `
+        <li id='${ingre}'  class='${haveIngredient ? 'strike' : ''}'>${ingre}</li>
+      `
+    });
+  }
+
+  function setCook(recipe) {
+    recipe.ingredients.forEach(ingre => {
+      document.querySelector('#cook__list').innerHTML += `
+        <li>${ingre}</li>
+      `
+    });
+  }
+
+  function setRequest(recipe) {
+    document.querySelector('#request__title').innerText = `Mom's Request - ${recipe.title}`
+        
+    recipe.ingredients.forEach(ingre => {
+      document.querySelector('#request__list').innerHTML += `
+        <li>${ingre}</li>
+      `
+    });
+  }
+
+  function checkIngredientInHand(ingreName) {
+    let ingredients = JSON.parse(localStorage.getItem('ingredients'))
+    let index = ingredients.findIndex(ingre => ingre == ingreName)
+    return index > -1 
+  }
+
+
+  
+</script>
+
+</html>

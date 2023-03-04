@@ -1,0 +1,78 @@
+{
+  "recipes": [
+    {
+      "title": "bagel",
+      "ingredients": [
+        "water",
+        "yeast",
+        "flour",
+        "sugar",
+        "salt",
+        "oil",
+        "egg",
+        "honey"
+      ]
+    },
+    {
+      "title":"dumplings",
+      "ingredients": [
+        "vegetable",
+        "meat",
+        "wine",
+        "oil",
+        "salt",
+        "soy sauce",
+        "pepper",
+        "water"
+      ]
+    },
+    {
+      "title": "hamburger",
+      "ingredients": [
+        "meat",
+        "breadcrumbs",
+        "egg",
+        "worcestershire sauce",
+        "milk",
+        "salt",
+        "garlic powder",
+        "onion powder",
+        "pepper"
+      ]
+    },
+    {
+      "title": "pizza",
+      "ingredients": [
+        "water",
+        "yeast",
+        "flour",
+        "oil",
+        "salt",
+        "sugar",
+        "cornmeal",
+        "tomato sauce",
+        "cheese",
+        "mushroom",
+        "sausage",
+        "olives",
+        "herbs",
+        "pepperoni",
+        "hams"
+      ]
+    },
+    {
+      "title": "cupcake",
+      "ingredients": [
+        "flour",
+        "baking powder",
+        "salt",
+        "butter",
+        "sugar",
+        "egg",
+        "vanilla",
+        "buttermilk"
+      ]
+      
+    }
+  ]
+}

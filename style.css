@@ -1,0 +1,158 @@
+:root {
+  --background: beige;
+  --black: rgb(21, 21, 33);
+  --primary: khaki;
+  font-size: 18px;
+}
+
+@font-face {
+  font-family: "CubicFive";
+  src: url(./fonts/cubicfive12.ttf);
+}
+
+@font-face {
+  font-family: "Munro";
+  src: url(./fonts/munro.ttf);
+}
+
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Munro', sans-serif;
+  color: var(--black);
+}
+
+h1, h2, h3, h4, h5, h6, button {
+  font-family: 'CubicFive', sans-serif;
+}
+
+dialog, .checklist {
+  margin: auto;
+  padding: 1.2rem;
+  border: 5px solid var(--black);
+}
+
+dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.537);
+}
+
+.checklist {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  margin: 3rem;
+  background-color: var(--background);
+  display: none;
+}
+
+h1 {
+  margin-bottom: 1em;
+  text-align: center;
+}
+
+p {
+  text-align: center;
+  font-size: 1.2rem;
+  margin-bottom: 1.5em;
+}
+
+ul {
+  padding-left: 2rem;
+  margin-bottom: 1rem;
+  columns: 2;
+  gap: 2rem;
+  width: fit-content;
+  margin-inline: auto;
+}
+
+.no-margin-bottom {
+  margin-bottom: 0;
+}
+
+.strike {
+  text-decoration: line-through;
+}
+
+p, li {
+  font-size: 1.4rem;
+}
+
+li {
+  width: fit-content;
+  padding-left: 1rem;
+  margin-bottom: .5rem;
+}
+
+form[method="dialog"] {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+button {
+  font-size: 1rem;
+  padding: .5em;
+  width: 8rem;
+  font-weight: bold;
+
+  background-color: transparent;
+  border: none;
+  outline: none;
+}
+
+button.yes {
+  border: 2px solid var(--black);
+  background-color: #aae731;
+}
+
+button:hover {
+  cursor: pointer;
+}
+
+button:disabled {
+  border: 2px solid rgb(123, 123, 123);
+  background-color: rgb(191, 191, 191);
+  color: rgb(123, 123, 123);
+}
+
+.ingredient-tip {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+}
+
+.ingredient-tip h1 {
+  font-size: 1rem;
+  display: none;
+  padding: 1rem;
+  background-color: rgba(0, 0, 0, 0.722);
+  color: white;
+  transform: translateY(5em);
+}
+
+.loading {
+  width: 30rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.loading img{
+  width: 15rem;
+  aspect-ratio: 1;
+  object-fit: contain;
+  margin-bottom: 1rem;
+}
+
+.loading form {
+  display: none;
+}
+
+.loading .yes {
+  width: auto;
+}
