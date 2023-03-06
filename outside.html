@@ -52,11 +52,16 @@
 </head>
 <body>
   <a-scene inspector="url: https://cdn.jsdelivr.net/gh/aframevr/aframe-inspector@master/dist/aframe-inspector.min.js">
+    <a-assets>
+      <a-asset-item id="outside" src="gltfs/Outside.gltf"></a-asset-item>
+      <a-asset-item id="stall" src="gltfs/FreshStall.gltf"></a-asset-item>
+    </a-assets>
+
     <a-entity camera position="0.7 0.5 10.4" look-controls wasd-controls="acceleration: 10"> 
       <a-cursor far="0.5"></a-cursor>
     </a-entity>
 
-    <a-entity gltf-model="url(gltfs/Outside.gltf)" rotation="0 -90 0" scale=".6 .6 .6">
+    <a-entity gltf-model="#outside" rotation="0 -90 0" scale=".6 .6 .6">
       <a-box id="home-door" material="transparent: true; depthTest: false" 
         opacity="0" 
         position="18.210 0.794 -0.949" 
@@ -75,7 +80,7 @@
         height="2"
         door-market></a-box>
 
-      <a-entity gltf-model="url(gltfs/FreshStall.gltf)" position="-5.581 0.119 5.281" rotation="0 53.310 0" scale="0.5 0.5 0.5">
+      <a-entity gltf-model="#stall" position="-5.581 0.119 5.281" rotation="0 53.310 0" scale="0.5 0.5 0.5">
 
         <a-box id="stall" material="transparent: true; depthTest: false" 
           opacity="0"
@@ -89,7 +94,7 @@
 
     </a-entity>
 
-    <a-sky color="black"></a-sky>
+    <a-sky color="skyblue"></a-sky>
   </a-scene>
 
   <div id="ingredient-tip" class="ingredient-tip">
