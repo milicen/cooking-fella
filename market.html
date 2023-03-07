@@ -7,6 +7,8 @@
 
   <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
   <script src="https://cdn.rawgit.com/elbobo/aframe-multisrc-component/b6d23310/dist/0.3/aframe-multisrc-component.js"></script>
+  <script src="./shared.js"></script>
+
   <link rel="stylesheet" href="style.css">
 
   <script>
@@ -49,8 +51,9 @@
 
 </head>
 <body>
-  <a-scene loading-screen inspector="url: https://cdn.jsdelivr.net/gh/aframevr/aframe-inspector@master/dist/aframe-inspector.min.js">
+  <a-scene>
     <a-assets>
+      <a-asset-item id="market" src="gltfs/Supermarket.gltf"></a-asset-item>
       <img src="imgs/aisle_01.png" id="aisle_01">
       <img src="imgs/aisle_02.png" id="aisle_02">
       <img src="imgs/fridge.png" id="fridge">
@@ -63,7 +66,7 @@
       <a-cursor far="0.5"></a-cursor>
     </a-entity>
 
-    <a-entity gltf-model="url(gltfs/Supermarket.gltf)">
+    <a-entity gltf-model="#market">
       <a-box id="door" material="transparent: true; depthTest: false" 
         opacity="0" 
         position="4.747 1.913 0.163" 
@@ -118,7 +121,6 @@
         scale="1 0.210 0.370"
         ingredient
         ></a-box>
-
     </a-box>
 
     <a-box
@@ -412,49 +414,12 @@ let recipe
 recipe = JSON.parse(localStorage.getItem('recipe'))
 setChecklist(recipe)
 
-function setChecklist(recipe) {
-  document.querySelector('#checklist').style.display = 'block'
-  console.log(recipe)
-  document.querySelector('#checklist__title').innerText = `${recipe.title}`
-
-  recipe.ingredients.forEach(ingre => {
-    let haveIngredient = checkIngredientInHand(ingre)
-    document.querySelector('#checklist__list').innerHTML += `
-      <li id='${ingre}' class='${haveIngredient ? 'strike' : ''}'>${ingre}</li>
-    `
-  })
-
-  
-
-}
-
 exitPopup.addEventListener('close', (e) => {
     if (exitPopup.returnValue === 'cancel') return
 
     location.replace('./outside.html')
   })
 
-function checkIngredientInHand(ingreName) {
-    let ingredients = JSON.parse(localStorage.getItem('ingredients'))
-    let index = ingredients.findIndex(ingre => ingre == ingreName)
-    return index > -1 
-  }
-
-function checkIngredientInRecipe(ingreName) {
-  let recipe = JSON.parse(localStorage.getItem('recipe'))
-  let index = recipe.ingredients.findIndex(ingre => ingre == ingreName)
-  return index > -1
-}
-
-function addIngredientToStorage(ingreName) {
-  let ingredients = JSON.parse(localStorage.getItem('ingredients'))
-  ingredients.push(ingreName)
-  localStorage.setItem('ingredients', JSON.stringify(ingredients))
-
-  let checklistItems = Array.from(document.querySelector('#checklist__list').children)
-  let item = checklistItems.find(checkItem => checkItem.id == ingreName)
-  item.classList.add('strike')
-}
 </script>
 
 </html>

@@ -6,6 +6,8 @@
   <title>Outside</title>
 
   <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
+  <script src="./shared.js"></script>
+  
   <link rel="stylesheet" href="style.css">
 
   <script>
@@ -51,7 +53,7 @@
   </script>
 </head>
 <body>
-  <a-scene inspector="url: https://cdn.jsdelivr.net/gh/aframevr/aframe-inspector@master/dist/aframe-inspector.min.js">
+  <a-scene>
     <a-assets>
       <a-asset-item id="outside" src="gltfs/Outside.gltf"></a-asset-item>
       <a-asset-item id="stall" src="gltfs/FreshStall.gltf"></a-asset-item>
@@ -136,27 +138,11 @@
   const stallPopup = document.querySelector('#stall-popup')
   const enterAreaTitle = document.querySelector('#enter-popup h1')
   const enterAreaAffirm = document.querySelector('#enter-popup p')
-  
-  const homeDoor = document.querySelector('#home-door')
-  const marketDoor = document.querySelector('#market-door')
 
   let recipe
 
   recipe = JSON.parse(localStorage.getItem('recipe'))
   setChecklist(recipe)
-
-  function setChecklist(recipe) {
-    document.querySelector('#checklist').style.display = 'block'
-    console.log(recipe)
-    document.querySelector('#checklist__title').innerText = `${recipe.title}`
-
-    recipe.ingredients.forEach(ingre => {
-      let haveIngredient = checkIngredientInHand(ingre)
-      document.querySelector('#checklist__list').innerHTML += `
-        <li id='${ingre}'  class='${haveIngredient ? 'strike' : ''}'>${ingre}</li>
-      `
-    })
-  }
 
   enterPopup.addEventListener('close', (e) => {
     if (enterPopup.returnValue === 'cancel') return
@@ -185,28 +171,6 @@
     }
   })
   
-  function checkIngredientInHand(ingreName) {
-    let ingredients = JSON.parse(localStorage.getItem('ingredients'))
-    let index = ingredients.findIndex(ingre => ingre == ingreName)
-    return index > -1 
-  }
-
-  function checkIngredientInRecipe(ingreName) {
-    let recipe = JSON.parse(localStorage.getItem('recipe'))
-    let index = recipe.ingredients.findIndex(ingre => ingre == ingreName)
-    return index > -1
-  }
-
-  function addIngredientToStorage(ingreName) {
-    let ingredients = JSON.parse(localStorage.getItem('ingredients'))
-    ingredients.push(ingreName)
-    localStorage.setItem('ingredients', JSON.stringify(ingredients))
-
-    let checklistItems = Array.from(document.querySelector('#checklist__list').children)
-    let item = checklistItems.find(checkItem => checkItem.id == ingreName)
-    item.classList.add('strike')
-  }
-
 </script>
 
 </html>

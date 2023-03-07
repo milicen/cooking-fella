@@ -6,6 +6,7 @@
   <title>Home</title>
 
   <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
+  <script src="./shared.js"></script>
 
   <link rel="stylesheet" href="style.css">
 
@@ -42,7 +43,7 @@
 
 </head>
 <body>
-  <a-scene loading-screen inspector="url: https://cdn.jsdelivr.net/gh/aframevr/aframe-inspector@master/dist/aframe-inspector.min.js">
+  <a-scene>
     <a-assets>
       <a-asset-item id="kitchen" src="gltfs/Kitchen.gltf"></a-asset-item>
     </a-assets>
@@ -125,11 +126,28 @@
   const exitPopup = document.querySelector('#exit-popup')
 
   const loadingPopup = document.querySelector('#loading')
-  
-  const oven = document.querySelector('#oven')
-  const door = document.querySelector('#door')
 
   let recipe
+
+  if (!localStorage.getItem('fresh') || JSON.parse(localStorage.getItem('fresh'))) {
+    localStorage.setItem('fresh', true)
+
+    let recipes = fetch('./recipes.json')
+      .then((response) => response.json())
+      .then((json) => {
+        recipes = json.recipes
+        requestPopup.showModal()
+        console.log(recipes)
+        recipe = recipes[Math.floor(Math.random() * recipes.length)]
+        console.log(recipe)
+        setRequest(recipe)
+      })
+  }
+  else {
+    recipe = JSON.parse(localStorage.getItem('recipe'))
+    setChecklist(recipe)
+    setCook(recipe)
+  }
 
   requestPopup.addEventListener('close', (e) => {
     localStorage.setItem('recipe', JSON.stringify(recipe))
@@ -190,38 +208,6 @@
     }
   })
 
-  if (!localStorage.getItem('fresh') || JSON.parse(localStorage.getItem('fresh'))) {
-    localStorage.setItem('fresh', true)
-
-    let recipes = fetch('./recipes.json')
-      .then((response) => response.json())
-      .then((json) => {
-        recipes = json.recipes
-        requestPopup.showModal()
-        console.log(recipes)
-        recipe = recipes[Math.floor(Math.random() * recipes.length)]
-        console.log(recipe)
-        setRequest(recipe)
-      })
-  }
-  else {
-    recipe = JSON.parse(localStorage.getItem('recipe'))
-    setChecklist(recipe)
-    setCook(recipe)
-  }
-
-  function setChecklist(recipe) {
-    document.querySelector('#checklist').style.display = 'block'
-    document.querySelector('#checklist__title').innerText = `${recipe.title}`
-
-    recipe.ingredients.forEach(ingre => {
-      let haveIngredient = checkIngredientInHand(ingre)
-      document.querySelector('#checklist__list').innerHTML += `
-        <li id='${ingre}'  class='${haveIngredient ? 'strike' : ''}'>${ingre}</li>
-      `
-    });
-  }
-
   function setCook(recipe) {
     recipe.ingredients.forEach(ingre => {
       document.querySelector('#cook__list').innerHTML += `
@@ -239,14 +225,6 @@
       `
     });
   }
-
-  function checkIngredientInHand(ingreName) {
-    let ingredients = JSON.parse(localStorage.getItem('ingredients'))
-    let index = ingredients.findIndex(ingre => ingre == ingreName)
-    return index > -1 
-  }
-
-
   
 </script>
 
